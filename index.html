@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة السلامة في المصانع</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a5276;
+            --secondary: #2e86c1;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #f8f9fa;
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* التصميم الرئيسي */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* الشريط الجانبي */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary), #154360);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            box-shadow: 3px 0 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .sidebar-logo i {
+            margin-left: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .company-name {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .menu-section {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: 1rem;
+        }
+        
+        .menu-item {
+            padding: 0.9rem 1.5rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-right: 4px solid transparent;
+            font-size: 0.95rem;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255,255,255,0.1);
+            border-right-color: var(--secondary);
+        }
+        
+        .menu-item i {
+            margin-left: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .menu-badge {
+            background: var(--accent);
+            color: white;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            margin-right: auto;
+        }
+        
+        /* المحتوى الرئيسي */
+        .main-content {
+            flex: 1;
+            margin-right: var(--sidebar-width);
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+        
+        /* الهيدر */
+        .top-header {
+            background: white;
+            height: var(--header-height);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+            margin-left: 15px;
+        }
+        
+        .page-title {
+            font-size: 1.4rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+        
+        .page-title i {
+            margin-left: 10px;
+            color: var(--secondary);
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-left: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .user-role {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+        
+        .notification-icon {
+            position: relative;
+            margin-left: 20px;
+            font-size: 1.3rem;
+            color: var(--dark);
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* منطقة المحتوى */
+        .content-area {
+            padding: 1.5rem;
+            min-height: calc(100vh - var(--header-height));
+        }
+        
+        /* الكروت */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border-top: 4px solid var(--secondary);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--secondary);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .card-icon {
+            font-size: 2.8rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            color: var(--primary);
+        }
+        
+        .card-description {
+            color: #7f8c8d;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .card-stats {
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #eee;
+            padding-top: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.8rem;
+        }
+        
+        /* الإحصائيات */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            border-top: 4px solid var(--secondary);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .stat-icon {
+            font-size: 2.2rem;
+            color: var(--secondary);
+            margin-bottom: 0.8rem;
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .stat-trend {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .trend-up {
+            color: var(--success);
+        }
+        
+        .trend-down {
+            color: var(--accent);
+        }
+        
+        /* النماذج */
+        .form-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.8rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-title {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            font-size: 1.3rem;
+        }
+        
+        .form-title i {
+            margin-left: 10px;
+            color: var(--secondary);
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(46, 134, 193, 0.2);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--secondary);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background: #2471a3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn i {
+            margin-left: 8px;
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .btn-success {
+            background: var(--success);
+        }
+        
+        .btn-success:hover {
+            background: #219653;
+        }
+        
+        /* حالة النظام */
+        .status-message {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-top: 1rem;
+            text-align: center;
+            display: none;
+        }
+        
+        .success {
+            background-color: rgba(39, 174, 96, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+        
+        .error {
+            background-color: rgba(231, 76, 60, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        /* شاشة تسجيل الدخول المدمجة */
+        .login-section {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+        }
+        
+        .login-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .login-logo {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-logo i {
+            margin-left: 10px;
+        }
+        
+        .login-subtitle {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+        
+        .login-body {
+            padding: 2rem;
+        }
+        
+        .login-form .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .login-footer {
+            margin-top: 1.5rem;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        /* التجاوب مع الشاشات الصغيرة */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-right: 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .cards-container {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .content-area {
+                padding: 1rem;
+            }
+            
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .top-header {
+                padding: 0 1rem;
+            }
+            
+            .user-details {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .login-body {
+                padding: 1.5rem;
+            }
+        }
+        
+        /* كلاسات مساعدة */
+        .hidden {
+            display: none;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .mb-3 {
+            margin-bottom: 1.5rem;
+        }
+        
+        .mt-3 {
+            margin-top: 1.5rem;
+        }
+        
+        .d-flex {
+            display: flex;
+        }
+        
+        .justify-between {
+            justify-content: space-between;
+        }
+        
+        .align-center {
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginScreen" class="login-section">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="login-logo">
+                    <i class="fas fa-hard-hat"></i> نظام السلامة
+                </div>
+                <div class="login-subtitle">نظام متكامل لإدارة السلامة في المصانع</div>
+            </div>
+            <div class="login-body">
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="username">اسم المستخدم</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="username" name="username" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">كلمة المرور</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" name="password" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-block"><i class="fas fa-sign-in-alt"></i> دخول</button>
+                    
+                    <div id="loginStatus" class="status-message"></div>
+                    
+                    <div class="login-footer">
+                        <p>بيانات الدخول التجريبية:</p>
+                        <p>مدير النظام: admin / 123456</p>
+                        <p>مشرف السلامة: safety / 123456</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- النظام الرئيسي -->
+    <div id="mainSystem" class="app-container hidden">
+        <!-- الشريط الجانبي -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-hard-hat"></i> نظام السلامة
+                </div>
+                <div class="company-name">مصنع النخبة للصناعات</div>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-section">الإدارة الرئيسية</div>
+                <div class="menu-item active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>لوحة التحكم</span>
+                </div>
+                
+                <div class="menu-section">وحدات السلامة</div>
+                <div class="menu-item" data-page="contractors">
+                    <i class="fas fa-users"></i>
+                    <span>إدارة المقاولين</span>
+                    <span class="menu-badge">3</span>
+                </div>
+                <div class="menu-item" data-page="accidents">
+                    <i class="fas fa-car-crash"></i>
+                    <span>إدارة الحوادث</span>
+                    <span class="menu-badge">5</span>
+                </div>
+                <div class="menu-item" data-page="permits">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>تصريح الأعمال</span>
+                    <span class="menu-badge">2</span>
+                </div>
+                <div class="menu-item" data-page="risks">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>تقييم المخاطر</span>
+                </div>
+                <div class="menu-item" data-page="clinic">
+                    <i class="fas fa-clinic-medical"></i>
+                    <span>العيادة الطبية</span>
+                    <span class="menu-badge">7</span>
+                </div>
+                <div class="menu-item" data-page="environment">
+                    <i class="fas fa-leaf"></i>
+                    <span>إدارة البيئة</span>
+                </div>
+                <div class="menu-item" data-page="nearmiss">
+                    <i class="fas fa-eye"></i>
+                    <span>الحوادث الوشيكة</span>
+                </div>
+                <div class="menu-item" data-page="visits">
+                    <i class="fas fa-walking"></i>
+                    <span>سجل المرور اليومي</span>
+                </div>
+                
+                <div class="menu-section">الإدارة</div>
+                <div class="menu-item" data-page="users">
+                    <i class="fas fa-user-cog"></i>
+                    <span>إدارة المستخدمين</span>
+                </div>
+                <div class="menu-item" data-page="reports">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>التقارير والإحصائيات</span>
+                </div>
+                
+                <div class="menu-item" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>تسجيل الخروج</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- المحتوى الرئيسي -->
+        <div class="main-content">
+            <!-- الهيدر -->
+            <div class="top-header">
+                <div class="header-left">
+                    <button class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</h1>
+                </div>
+                
+                <div class="header-right">
+                    <div class="notification-icon">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    
+                    <div class="user-info">
+                        <div class="user-avatar" id="userAvatar">م</div>
+                        <div class="user-details">
+                            <div class="user-name" id="userName">مستخدم</div>
+                            <div class="user-role" id="userRole">دور المستخدم</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- منطقة المحتوى -->
+            <div class="content-area">
+                <!-- لوحة التحكم -->
+                <div id="dashboard" class="page-content">
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-car-crash"></i>
+                            </div>
+                            <div class="stat-value" id="totalAccidents">12</div>
+                            <div class="stat-label">إجمالي الحوادث</div>
+                            <div class="stat-trend trend-down">
+                                <i class="fas fa-arrow-down"></i> 5% عن الشهر الماضي
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <div class="stat-value" id="openPermits">8</div>
+                            <div class="stat-label">التصاريح المفتوحة</div>
+                            <div class="stat-trend trend-up">
+                                <i class="fas fa-arrow-up"></i> 2% زيادة
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-value" id="highRisks">5</div>
+                            <div class="stat-label">مخاطر عالية</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="fas fa-eye"></i>
+                            </div>
+                            <div class="stat-value" id="nearMisses">3</div>
+                            <div class="stat-label">حوادث وشيكة</div>
+                            <div class="stat-trend trend-down">
+                                <i class="fas fa-arrow-down"></i> 1% عن الشهر الماضي
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="cards-container">
+                        <div class="card">
+                            <div class="card-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3 class="card-title">إدارة المقاولين</h3>
+                            <p class="card-description">إدارة معلومات المقاولين والموظفين والعقود والتدريب على السلامة</p>
+                            <div class="card-stats">
+                                <div class="stat">
+                                    <div class="stat-value">15</div>
+                                    <div class="stat-label">مقاول نشط</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value">3</div>
+                                    <div class="stat-label">بحاجة تجديد</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-icon">
+                                <i class="fas fa-car-crash"></i>
+                            </div>
+                            <h3 class="card-title">إدارة الحوادث</h3>
+                            <p class="card-description">تسجيل وتحليل الحوادث وإعداد التقارير واتخاذ الإجراءات التصحيحية</p>
+                            <div class="card-stats">
+                                <div class="stat">
+                                    <div class="stat-value">12</div>
+                                    <div class="stat-label">حادث مسجل</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value">2</div>
+                                    <div class="stat-label">تحت التحقيق</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-icon">
+                                <i class="fas fa-clipboard-check"></i>
+                            </div>
+                            <h3 class="card-title">تصريح الأعمال</h3>
+                            <p class="card-description">إصدار ومتابعة تصاريح العمل الخطرة وتقييم المخاطر المرتبطة بها</p>
+                            <div class="card-stats">
+                                <div class="stat">
+                                    <div class="stat-value">8</div>
+                                    <div class="stat-label">تصريح نشط</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value">3</div>
+                                    <div class="stat-label">ينتهي قريباً</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h3 class="card-title">تقييم المخاطر</h3>
+                            <p class="card-description">تحديد وتقييم المخاطر ووضع إجراءات التحكم ومتابعة التنفيذ</p>
+                            <div class="card-stats">
+                                <div class="stat">
+                                    <div class="stat-value">24</div>
+                                    <div class="stat-label">تقييم مكتمل</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value">5</div>
+                                    <div class="stat-label">عالية الخطورة</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-icon">
+                                <i class="fas fa-clinic-medical"></i>
+                            </div>
+                            <h3 class="card-title">العيادة الطبية</h3>
+                            <p class="card-description">سجل الزيارات الطبية والإسعافات الأولية والمتابعة الصحية</p>
+                            <div class="card-stats">
+                                <div class="stat">
+                                    <div class="stat-value">47</div>
+                                    <div class="stat-label">زيارة هذا الشهر</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value">3</div>
+                                    <div class="stat-label">حالات طارئة</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <h3 class="card-title">إدارة البيئة</h3>
+                            <p class="card-description">مراقبة المؤشرات البيئية والامتثال للوائح وإدارة النفايات</p>
+                            <div class="card-stats">
+                                <div class="stat">
+                                    <div class="stat-value">12</div>
+                                    <div class="stat-label">فحص بيئي</div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-value">2</div>
+                                    <div class="stat-label">مخالفات</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- باقي الصفحات سيتم إضافتها هنا -->
+                <div id="contractors" class="page-content hidden">
+                    <h1 class="page-title"><i class="fas fa-users"></i> إدارة المقاولين</h1>
+                    <!-- محتوى إدارة المقاولين -->
+                </div>
+                
+                <div id="users" class="page-content hidden">
+                    <h1 class="page-title"><i class="fas fa-user-cog"></i> إدارة المستخدمين</h1>
+                    <!-- محتوى إدارة المستخدمين -->
+                </div>
+                
+                <!-- يمكن إضافة باقي الصفحات بنفس الطريقة -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // بيانات النظام
+        const users = {
+            'admin': { 
+                password: '123456', 
+                name: 'مدير النظام',
+                role: 'مدير',
+                avatar: 'م'
+            },
+            'safety': { 
+                password: '123456', 
+                name: 'أحمد محمد',
+                role: 'مشرف سلامة',
+                avatar: 'أ'
+            }
+        };
+
+        // حالة النظام
+        let currentUser = null;
+        let currentPage = 'dashboard';
+
+        // عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            // التحقق من تسجيل الدخول
+            checkLoginStatus();
+            
+            // إعداد مستمعي الأحداث
+            setupEventListeners();
+        });
+
+        // إعداد مستمعي الأحداث
+        function setupEventListeners() {
+            // تسجيل الدخول
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            
+            // تسجيل الخروج
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+            
+            // عناصر القائمة
+            document.querySelectorAll('.menu-item:not(#logoutBtn)').forEach(item => {
+                item.addEventListener('click', function() {
+                    switchPage(this.getAttribute('data-page'));
+                });
+            });
+            
+            // زر القائمة المتنقلة
+            document.querySelector('.menu-toggle').addEventListener('click', function() {
+                document.querySelector('.sidebar').classList.toggle('active');
+            });
+        }
+
+        // معالجة تسجيل الدخول
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginStatus = document.getElementById('loginStatus');
+            
+            if (users[username] && users[username].password === password) {
+                currentUser = {
+                    username: username,
+                    ...users[username]
+                };
+                
+                // حفظ حالة تسجيل الدخول
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // إظهار النظام الرئيسي
+                showMainSystem();
+            } else {
+                showStatus(loginStatus, 'اسم المستخدم أو كلمة المرور غير صحيحة', 'error');
+            }
+        }
+
+        // معالجة تسجيل الخروج
+        function handleLogout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            showLoginScreen();
+        }
+
+        // التحقق من حالة تسجيل الدخول
+        function checkLoginStatus() {
+            const savedUser = localStorage.getItem('currentUser');
+            
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showMainSystem();
+            } else {
+                showLoginScreen();
+            }
+        }
+
+        // إظهار شاشة تسجيل الدخول
+        function showLoginScreen() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainSystem').classList.add('hidden');
+            document.getElementById('loginForm').reset();
+        }
+
+        // إظهار النظام الرئيسي
+        function showMainSystem() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainSystem').classList.remove('hidden');
+            
+            // تحديث معلومات المستخدم
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userRole').textContent = currentUser.role;
+            document.getElementById('userAvatar').textContent = currentUser.avatar;
+            
+            // تحديث عنوان الصفحة
+            document.querySelector('.page-title').innerHTML = `<i class="fas fa-tachometer-alt"></i> لوحة التحكم`;
+            
+            // إظهار الصفحة الافتراضية
+            switchPage('dashboard');
+        }
+
+        // تبديل الصفحات
+        function switchPage(pageId) {
+            // إخفاء جميع الصفحات
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            // إظهار الصفحة المطلوبة
+            document.getElementById(pageId).classList.remove('hidden');
+            
+            // تحديث القائمة النشطة
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            document.querySelector(`.menu-item[data-page="${pageId}"]`).classList.add('active');
+            
+            // تحديث عنوان الصفحة في الهيدر
+            const pageTitle = document.querySelector(`.menu-item[data-page="${pageId}"] span`).textContent;
+            const pageIcon = document.querySelector(`.menu-item[data-page="${pageId}"] i`).className;
+            document.querySelector('.page-title').innerHTML = `<i class="${pageIcon}"></i> ${pageTitle}`;
+            
+            // تحديث الصفحة الحالية
+            currentPage = pageId;
+            
+            // إغلاق القائمة على الأجهزة الصغيرة
+            if (window.innerWidth <= 992) {
+                document.querySelector('.sidebar').classList.remove('active');
+            }
+        }
+
+        // عرض رسالة حالة
+        function showStatus(element, message, type) {
+            element.textContent = message;
+            element.className = 'status-message';
+            
+            if (type === 'success') {
+                element.classList.add('success');
+            } else if (type === 'error') {
+                element.classList.add('error');
+            }
+            
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        // وظائف إضافية للنظام
+        function loadDashboardData
